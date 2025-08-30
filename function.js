@@ -1,84 +1,57 @@
-bisection('x^3 - 1', -10, 10);
+let equation;
+let f;
+let intervalA;
+let intervalB;
+let tol;
 
-function bisection(equation, a, b, tol = 0.0001) {
-
-	const f = math.compile(equation);
-	method = (a, b) => (a + b)/2;
-
-	return solutionEquation(method, f, a, b, tol, {
-
-		equation: equation,
-		iter: 0
-
-	});
-
+function setData(equa, interA, interB, tolerance) {
+  equation = equa;
+  intervalA = interA;
+  intervalB = interB;
+  tol = tolerance;
+  f = math.compile(equation);
 }
 
-function fake_position(equation, a, b, tol = 0.0001) {
+function bisection() {
+  method = (a, b) => (a + b) / 2;
 
-	const f = math.compile(equation);
-	method = (a, b) => {
-
-		return b - f.evaluate({ x: b }) * ((a - b) / (f.evaluate({ x: a }) - f.evaluate({ x: b })));
-
-	}
-
-	return solutionEquation(method, f, a, b, tol, {
-
-		equation: equation,
-		iter: 0
-
-	});
-
+  return solutionEquation(method, intervalA, intervalB);
 }
 
-function solutionEquation(method, f, a, b, tol, iteration, last_error = null) {
+function fakePosition() {
+  method = (a, b) =>
+    b -
+    f.evaluate({ x: b }) *
+      ((a - b) / (f.evaluate({ x: a }) - f.evaluate({ x: b })));
 
-	const p = f.evaluate({ x: a }) * f.evaluate({ x: b });
+  return solutionEquation(method, intervalA, intervalB);
+}
 
-	if (p<0) {
+function solutionEquation(method, a, b, iteration = [], lastError = null) {
+  const p = f.evaluate({ x: a }) * f.evaluate({ x: b });
 
-		aprox = method(a, b);
-		f_aprox = f.evaluate({ x: aprox });
-		error = Math.abs(b - a);
+  if (p > 0) throw new Error("Function does not cross the x-axis");
 
-		iteration.iter++;
+  if (p == 0) {
+    if (f.evaluate({ x: a }) === 0) return [a];
+    if (f.evaluate({ x: b }) === 0) return [b];
+    return;
+  }
 
-		show_iteration(iteration.iter, iteration.equation.replace('x', `(${aprox})`), f_aprox, error);
+  const aprox = method(a, b);
+  const fAprox = f.evaluate({ x: aprox });
+  const error = Math.abs(b - a);
 
-		if (f_aprox==0 || error<tol || error==last_error) {
+  const replacedX = equation.replace("x", `(${aprox})`);
+  iteration.push({ aprox, replacedX, fAprox, error });
 
-			return aprox;
+  if (fAprox === 0 || error < tol || error === lastError) return iteration;
 
-		}else{
-
-			return solutionEquation(
-
-				method, f,
-				f_aprox<0 ? aprox : a,
-				f_aprox>=0 ? aprox : b,
-				tol, iteration, error
-
-			);
-
-		}
-
-	}else if (p==0){
-
-		if (f.evaluate({ x: a })==0){//f(a) = 0
-
-			return a;
-
-		}else if (f.evaluate({ x: b })==0) {//f(b) = 0
-
-			return b;
-
-		}
-
-	}else{
-
-		throw new Error('Function does not cross the x-axis');
-
-	}
-
+  return solutionEquation(
+    method,
+    fAprox < 0 ? aprox : a,
+    fAprox > 0 ? aprox : b,
+    iteration,
+    error
+  );
 }

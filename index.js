@@ -1,8 +1,28 @@
+const elIter = document.getElementById("iteration");
+const elSubmit = document.getElementById("submit");
+let result = [];
 
-function show_iteration(iter, equation, result, error){
+elSubmit.addEventListener("click", () => {
+  const formData = document.forms["formData"];
+  const method = formData["method"].value;
+  const equation = formData["equation"].value;
+  const intervalA = +formData["intervalA"].value;
+  const intervalB = +formData["intervalB"].value;
+  const tolerance = +formData["tolerace"].value;
 
-	//Está función debe actualizar el contenido del componente que va mostrar las iteraciones
+  setData(equation, intervalA, intervalB, tolerance);
 
-	console.log(`${iter}. ${equation} = ${result}`, `Error: ${error}`);
+  if (method === "bisection") result = bisection();
+  if (method === "fakeposition") result = fakePosition();
 
-}
+  elIter.innerHTML = "";
+  result.forEach((iter) => {
+    elIter.innerHTML += `
+      <li style="margin-top: 10px">
+        <b>f(${iter.aprox})</b>
+        <p>${iter.replacedX} = ${iter.fAprox}</p>
+        <p>Error: ${iter.error}</p>
+      </li>
+    `;
+  });
+});

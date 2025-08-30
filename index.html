@@ -4,11 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.js"></script>
-	<script src="index.js"></script>
-	<script src="function.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.js"></script>
+    <script src="function.js"></script>
   </head>
   <body>
-    <h1>Pagina para el parcial</h1>
+    <h3>Pagina para el parcial</h3>
+
+    <form name="formData">
+      <fieldset>
+        <legend>datos</legend>
+
+        <select name="method">
+          <option value="bisection">Bisección</option>
+          <option value="fakeposition">Falsa posición</option>
+        </select>
+        <br /><br />
+
+        <label>ecuación:</label>
+        <input type="text" name="equation" value="x^3-1" />
+        <br /><br />
+
+        <label>intervalo A:</label>
+        <input type="number" name="intervalA" value="-10" />
+        <br /><br />
+
+        <label>intervalo B:</label>
+        <input type="number" name="intervalB" value="10" />
+        <br /><br />
+
+        <label>tolerancia:</label>
+        <input type="number" name="tolerace" value="0.001" />
+        <br /><br />
+
+        <input type="button" id="submit" value="Iterar" />
+      </fieldset>
+    </form>
+
+    <fieldset>
+      <legend>Iteraciones</legend>
+      <ol id="iteration"></ol>
+    </fieldset>
+
+    <script src="index.js"></script>
   </body>
 </html>
