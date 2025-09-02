@@ -32,7 +32,7 @@ function fakePosition() {
 function solutionEquation(method, a, b, iteration = [], lastError = null) {
   const p = f.evaluate({ x: a }) * f.evaluate({ x: b });
 
-  if (p > 0) throw new Error("Function does not cross the x-axis");
+  if (p > 0) alert("Function does not cross the x-axis");
 
   if (p == 0) {
     if (f.evaluate({ x: a }) === 0) return [a];
@@ -74,7 +74,7 @@ function fixedPoint(){
     if(evalB === 0) return [intervalB];
   }
   else {
-    throw new Error("The function does not meet the fixed point conditions");
+    alert("The function does not meet the fixed point conditions");
   }
 
   // Verificamos la contracción (derivada)
@@ -85,7 +85,7 @@ function fixedPoint(){
   const dB = fPrime.evaluate({x: intervalB});
 
   if(Math.abs(dA) > 1 || Math.abs(dB) > 1) {
-    throw new Error("The function does not meet the contraction conditions");
+    alert("The function does not meet the contraction conditions");
   }
 
   method = (a) => f.evaluate({x: a});
