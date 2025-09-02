@@ -14,13 +14,14 @@ elSubmit.addEventListener("click", () => {
 
   if (method === "bisection") result = bisection();
   if (method === "fakeposition") result = fakePosition();
+  if (method === "fixedpoint") result = fixedPoint();
 
   elIter.innerHTML = "";
   result.forEach((iter) => {
     elIter.innerHTML += `
       <li style="margin-top: 10px">
         <b>f(${iter.aprox})</b>
-        <p>${iter.replacedX} = ${iter.fAprox}</p>
+        <p>${iter.replacedX} = <b>${iter.fAprox}</b></p>
         <p>Error: ${iter.error}</p>
       </li>
     `;
