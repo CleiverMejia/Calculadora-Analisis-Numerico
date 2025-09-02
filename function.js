@@ -90,22 +90,21 @@ function fixedPoint(){
 
   method = (a) => f.evaluate({x: a});
 
-  return solutionOpenEquation(method, intervalA, intervalB, []);
+  return solutionOpenEquation(method, intervalA);
 }
 
-function solutionOpenEquation(method, actualRes, oldRes, iteration = [], lastError = null){
-  const a = method(actualRes);
+function solutionOpenEquation(method, oldRes, iteration = [], lastError = null){
+  const a = method(oldRes);
   const b = oldRes;
   const error = Math.abs(b - a);
 
-  const replacedX = equation.replace("x", `(${actualRes})`);
-  iteration.push({ aprox: actualRes, replacedX, fAprox: a, error });
+  const replacedX = equation.replace("x", `(${oldRes})`);
+  iteration.push({ aprox: oldRes, replacedX, fAprox: a, error });
 
   if (a === 0 || error < tol || error === lastError) return iteration;
 
   return solutionOpenEquation(
     method,
-    a,
     a,
     iteration,
     error
