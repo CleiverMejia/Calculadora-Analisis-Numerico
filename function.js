@@ -47,6 +47,11 @@ function solutionEquation(method, a, b, iteration = [], lastError = null) {
   const fAprox = f.evaluate({ x: aprox }); // evalua la funcion en el punto aproximado
   const error = Math.abs(b - a); // calcula el error
 
+  if (aprox === Infinity || isNaN(aprox)) {
+    alert("The method diverges to infinity or is undefined");
+    return;
+  }
+
   const replacedX = equation.replace("x", `(${aprox})`);
   iteration.push({ aprox, replacedX, fAprox, error });
 
@@ -63,56 +68,65 @@ function solutionEquation(method, a, b, iteration = [], lastError = null) {
 
 // Metodos Abiertos
 
-function fixedPoint(){
+function fixedPoint() {
   const f = math.parse(equation).compile();
 
   // Evaluamos extremos
-  const evalA = f.evaluate({x: intervalA});
-  const evalB = f.evaluate({x: intervalB});
+  const evalA = f.evaluate({ x: intervalA });
+  const evalB = f.evaluate({ x: intervalB });
 
-  if(evalA < intervalB && evalA > intervalA) {
-    if(evalA === 0) return [intervalA];
-  }
-  else if(evalB < intervalB && evalB > intervalA) {
-    if(evalB === 0) return [intervalB];
-  }
-  else {
+  if (evalA < intervalB && evalA > intervalA) {
+    if (evalA === 0) return [intervalA];
+  } else if (evalB < intervalB && evalB > intervalA) {
+    if (evalB === 0) return [intervalB];
+  } else {
     alert("The function does not meet the fixed point conditions");
     return;
   }
 
   // Verificamos la contracción (derivada)
-  const equationDerivative = math.derivative(equation, 'x'); // Derivada de la ecuación
+  const equationDerivative = math.derivative(equation, "x"); // Derivada de la ecuación
   const fPrime = equationDerivative.compile(); // Compilamos la derivada, para hacerla evaluable (que el codigo la reconozca como una funcion)
 
-  const dA = fPrime.evaluate({x: intervalA}); 
-  const dB = fPrime.evaluate({x: intervalB});
+  const dA = fPrime.evaluate({ x: intervalA });
+  const dB = fPrime.evaluate({ x: intervalB });
 
-  if(Math.abs(dA) > 1 || Math.abs(dB) > 1) {
+  if (Math.abs(dA) > 1 || Math.abs(dB) > 1) {
     alert("The function does not meet the contraction conditions");
     return;
   }
 
-  method = (a) => f.evaluate({x: a});
+  method = (a) => f.evaluate({ x: a });
 
   return solutionOpenEquation(method, intervalA);
 }
 
-function solutionOpenEquation(method, oldRes, iteration = [], lastError = null){
+function newtonRaphson() {
+  const equationDerivative = math.derivative(equation, "x"); // Derivada de la ecuación
+  const fPrime = equationDerivative.compile(); // Compilamos la derivada, para hacerla evaluable (que el codigo la reconozca como una funcion)
+  method = (a) => a - f.evaluate({ x: a }) / fPrime.evaluate({ x: a });
+  return solutionOpenEquation(method, intervalA);
+}
+
+function solutionOpenEquation(
+  method,
+  oldRes,
+  iteration = [],
+  lastError = null
+) {
   const a = method(oldRes); // genera un nuevo valor a partir del anterior
   const b = oldRes; //  guarda el valor anterior
   const error = Math.abs(b - a); // calcula el error, comparando ambos valores
+
+  if (a === Infinity || isNaN(a)) {
+    alert("The method diverges to infinity or is undefined");
+    return;
+  }
 
   const replacedX = equation.replace("x", `(${oldRes})`);
   iteration.push({ aprox: oldRes, replacedX, fAprox: a, error });
 
   if (a === 0 || error < tol || error === lastError) return iteration;
 
-  return solutionOpenEquation(
-    method,
-    a,
-    iteration,
-    error
-  );
+  return solutionOpenEquation(method, a, iteration, error);
 }
-

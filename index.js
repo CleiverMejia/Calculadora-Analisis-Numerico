@@ -15,6 +15,7 @@ elSubmit.addEventListener("click", () => {
   if (method === "bisection") result = bisection();
   if (method === "fakeposition") result = fakePosition();
   if (method === "fixedpoint") result = fixedPoint();
+  if (method === "newtonraphson") result = newtonRaphson();
 
   elIter.innerHTML = "";
   result.forEach((iter) => {
