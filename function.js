@@ -135,3 +135,107 @@ function gaussJordanMethod(matrix) {
   const result = new GaussJordan(matrix).solve();
   return result;
 }
+
+// Metodos Iterativos
+
+const { Equation } = algebra;
+
+const tolerance = 0.003;
+
+function jacobiMethod(A) {
+  // esto lo llama el html
+  console.log(jacobiConditioned(A));
+
+  if (jacobiConditioned(A) < 1) alert("Converge");
+
+  // convertir los valores de la matriz a formato de ecuaciones x1 + x2 = 0, etc
+  const vectorStrings = A.reduce((acc, row) => {
+    const expr = row
+      .map((val, j) =>
+        j === row.length - 1 ? `= ${val}` : `+ (${val}*x${j + 1})`
+      )
+      .join(" ")
+      .replace("+ ", "");
+    acc.push(expr);
+    return acc;
+  }, []);
+
+  console.log(vectorStrings);
+
+  const clears = clear(vectorStrings);
+  console.log(clears);
+  console.log(Array.isArray(clears));
+
+  jacobi(clears, Array(clears.length).fill(0));
+}
+
+function jacobi(sel = [], values) {
+  // la funcion que hace jacobi
+  const newValues = [];
+
+  console.log("Valores:", values);
+
+  sel.forEach((equa, index) => {
+    // Esto es lo que da error
+    let replaceValues = {};
+    for (let i = 0; i < sel.length; i++) {
+      if (i === index) continue;
+      replaceValues[`x${i + 1}`] = values[i];
+    }
+
+    let expr = equa.toString();
+
+    Object.keys(replaceValues).forEach((k) => {
+      expr = expr.replaceAll(k, `(${replaceValues[k]})`);
+    });
+
+    const equaEvaluated = math.evaluate(expr);
+    newValues[index] = equaEvaluated;
+  });
+
+  const err = jacobiError(values, newValues);
+  console.log("Error:", err);
+
+  if (err < tolerance) return newValues;
+
+  return jacobi(sel, newValues);
+}
+
+function jacobiError(prev, actual) {
+  // Calcula el error
+  return prev.reduce((acc, act, i) => acc + Math.abs(act - actual[i]), 0);
+}
+
+function jacobiConditioned(A) {
+  // Revisa si jacobi esta bien condicionado
+  const newA = [];
+  A.forEach((row, i) => {
+    let newRow = [];
+    row.forEach((column, j) => {
+      if (A.length === j) return;
+
+      newRow.push(column);
+    });
+
+    newA[i] = newRow;
+  });
+
+  const eig = math.eigs(newA);
+
+  const rho = Math.max(...eig.values.map((v) => Math.abs(v)));
+
+  return rho;
+}
+
+// const equations = ["3*x1 + x2 = 3", "x1 + 2*x2 = 4"];
+
+function clear(equations) {
+  // Despeja las ecuaciones
+  return equations.map((equa, index) => {
+    const [left, right] = equa.split("=");
+    const parsed = algebra.parse(left.trim());
+    return new Equation(parsed, +right.trim())
+      .solveFor(`x${index + 1}`)
+      .toString();
+  });
+}

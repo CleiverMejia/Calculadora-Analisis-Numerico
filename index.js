@@ -18,7 +18,7 @@ window.onload = () => {
 };
 
 methodSelected.addEventListener("change", (e) => {
-  if (e.target.value === "gaussjordan") {
+  if (e.target.value === "gaussjordan" || e.target.value === "jacobi") {
     params1.style.display = "none";
     params2.style.display = "block";
   } else {
@@ -115,8 +115,9 @@ elOtroSubmit.addEventListener("click", () => {
   let result = [];
 
   if (method === "gaussjordan") result = gaussJordanMethod(matrix);
+  if (method === "jacobi") result = jacobiMethod(matrix);
 
-  elIter.innerHTML = "";
+  /* elIter.innerHTML = "";
   result.forEach((iter) => {
     elIter.innerHTML += `
       <li style="margin-top: 10px">
@@ -126,5 +127,5 @@ elOtroSubmit.addEventListener("click", () => {
           .join("\n")}</pre>
       </li>
     `;
-  });
+  }); */
 });
