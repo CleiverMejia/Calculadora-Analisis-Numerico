@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
+  <script src="gauss-jordan.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/algebra.js/0.2.6/algebra.js"></script>
   <script src="function.js"></script>
@@ -19,31 +20,45 @@
     <fieldset>
       <legend>datos</legend>
 
-      <select name="method">
+      <select name="method" id="method">
         <option value="bisection">Bisección</option>
         <option value="fakeposition">Falsa posición</option>
         <option value="fixedpoint">Punto fijo</option>
         <option value="newtonraphson">Newton Raphson</option>
+        <option value="gaussjordan">Gauss Jordan</option>
       </select>
       <br /><br />
+      <div id="params1">
+        <label>ecuación:</label>
+        <input type="text" name="equation" value="20/(x^2 + 2x + 10)" />
+        <br /><br />
 
-      <label>ecuación:</label>
-      <input type="text" name="equation" value="20/(x^2 + 2x + 10)" />
-      <br /><br />
+        <label>intervalo A:</label>
+        <input type="number" name="intervalA" value="1" />
+        <br /><br />
 
-      <label>intervalo A:</label>
-      <input type="number" name="intervalA" value="1" />
-      <br /><br />
+        <label>intervalo B:</label>
+        <input type="number" name="intervalB" value="2" />
+        <br /><br />
 
-      <label>intervalo B:</label>
-      <input type="number" name="intervalB" value="2" />
-      <br /><br />
+        <label>tolerancia:</label>
+        <input type="number" name="tolerace" value="0.2" />
+        <br /><br />
 
-      <label>tolerancia:</label>
-      <input type="number" name="tolerace" value="0.2" />
-      <br /><br />
+        <input type="button" id="submit" class="submit" value="Iterar" />
+      </div>
 
-      <input type="button" id="submit" value="Iterar" />
+      <div id="params2">
+        <label>Matriz (separar por comas y punto y coma):</label>
+        <input type="text" name="matrix" value="2,-1,1,8; -3,3,9,-9; -1,2,5,4" />
+        <br /><br />
+
+        <label>tolerancia:</label>
+        <input type="number" name="tolerace2" value="0.2" />
+        <br /><br />
+
+        <input type="button" id="submit2" class="submit" value="Iterar" />
+      </div>
     </fieldset>
   </form>
 

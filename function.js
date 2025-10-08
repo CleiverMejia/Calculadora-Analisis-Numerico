@@ -130,3 +130,8 @@ function solutionOpenEquation(
 
   return solutionOpenEquation(method, a, iteration, error);
 }
+
+function gaussJordanMethod(matrix) {
+  const result = new GaussJordan(matrix).solve();
+  return result;
+}
