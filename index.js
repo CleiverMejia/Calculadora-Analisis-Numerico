@@ -6,9 +6,15 @@ const params1 = document.getElementById("params1");
 const params2 = document.getElementById("params2");
 let result = [];
 
+const matrixRowsInput = document.getElementById("matrixRows");
+const matrixColsInput = document.getElementById("matrixCols");
+const generateMatrixBtn = document.getElementById("generateMatrix");
+const matrixInputContainer = document.getElementById("matrixInputContainer");
+
 window.onload = () => {
   params1.style.display = "block";
   params2.style.display = "none";
+  generateMatrixInputs();
 };
 
 methodSelected.addEventListener("change", (e) => {
@@ -21,13 +27,64 @@ methodSelected.addEventListener("change", (e) => {
   }
 });
 
+generateMatrixBtn.addEventListener("click", generateMatrixInputs);
+
+function generateMatrixInputs() {
+  const rows = Number.parseInt(matrixRowsInput.value) || 3;
+  const cols = Number.parseInt(matrixColsInput.value) || 4;
+
+  // Clear previous inputs
+  matrixInputContainer.innerHTML = "";
+
+  // Create grid container
+  const grid = document.createElement("div");
+  grid.className = "matrix-grid";
+  grid.style.gridTemplateColumns = `repeat(${cols}, 70px)`;
+
+  // Create input cells
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = "any";
+      input.className = "matrix-cell";
+      input.dataset.row = i;
+      input.dataset.col = j;
+      input.placeholder = "0";
+      input.value = "0";
+      grid.appendChild(input);
+    }
+  }
+
+  matrixInputContainer.appendChild(grid);
+}
+
+function getMatrixFromInputs() {
+  const cells = document.querySelectorAll(".matrix-cell");
+  const rows = Number.parseInt(matrixRowsInput.value) || 3;
+  const cols = Number.parseInt(matrixColsInput.value) || 4;
+
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    matrix[i] = [];
+    for (let j = 0; j < cols; j++) {
+      const cell = document.querySelector(
+        `.matrix-cell[data-row="${i}"][data-col="${j}"]`
+      );
+      matrix[i][j] = Number.parseFloat(cell.value) || 0;
+    }
+  }
+
+  return matrix;
+}
+
 elSubmit.addEventListener("click", () => {
   const formData = document.forms["formData"];
   const method = formData["method"].value;
   const equation = formData["equation"].value;
   const intervalA = +formData["intervalA"].value;
   const intervalB = +formData["intervalB"].value;
-  const tolerance = +formData["tolerace"].value;
+  const tolerance = +formData["tolerance"].value;
 
   setData(equation, intervalA, intervalB, tolerance);
 
@@ -51,11 +108,8 @@ elSubmit.addEventListener("click", () => {
 elOtroSubmit.addEventListener("click", () => {
   const formData = document.forms["formData"];
   const method = formData["method"].value;
-  const matrixInput = formData["matrix"].value.trim();
 
-  console.log("Matriz ingresada:", matrixInput);
-
-  const matrix = parseMatrix(matrixInput);
+  const matrix = getMatrixFromInputs();
   console.log("Matriz procesada:", matrix);
 
   let result = [];
@@ -67,7 +121,9 @@ elOtroSubmit.addEventListener("click", () => {
     elIter.innerHTML += `
       <li style="margin-top: 10px">
         <b>${iter.operation}</b>
-        <pre>${iter.matrix.map((row) => row.join("\t")).join("\n")}</pre>
+        <pre>${iter.matrix
+          .map((row) => row.map((v) => v.toFixed(4)).join("\t"))
+          .join("\n")}</pre>
       </li>
     `;
   });

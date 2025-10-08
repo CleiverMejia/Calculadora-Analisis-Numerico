@@ -3,6 +3,7 @@ class GaussJordan {
   constructor(matrix) {
     this.matrix = matrix.map((row) => [...row]); // copia profunda
     this.n = matrix.length;
+    this.EPS = 1e-12;
   }
 
   showMatrix() {
@@ -62,9 +63,11 @@ class GaussJordan {
       const { maxRow, maxAbs } = this.findPivotRow(i, i);
 
       if (maxAbs < this.EPS) {
-        throw new Error(
-          `No unique solution (column ${i + 1} has no valid pivot).`
-        );
+        this.process.push({
+          operation: `No unique solution (column ${i + 1} has no valid pivot).`,
+          matrix: this.matrix.map((row) => [...row]),
+        });
+        return this.process; // Termina el proceso si no hay solución única
       }
 
       if (maxRow !== i) {
