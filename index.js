@@ -18,7 +18,7 @@ window.onload = () => {
 };
 
 methodSelected.addEventListener("change", (e) => {
-  if (e.target.value === "gaussjordan" || e.target.value === "jacobi") {
+  if (e.target.value === "gaussjordan" || e.target.value === "jacobi" || e.target.value === "seidel") {
     params1.style.display = "none";
     params2.style.display = "block";
   } else {
@@ -79,12 +79,15 @@ function getMatrixFromInputs() {
 }
 
 elSubmit.addEventListener("click", () => {
-  const formData = document.forms["formData"];
+
+	try{
+
+	const formData = document.forms["formData"];
   const method = formData["method"].value;
   const equation = formData["equation"].value;
   const intervalA = +formData["intervalA"].value;
   const intervalB = +formData["intervalB"].value;
-  const tolerance = +formData["tolerance"].value;
+  const tolerance = Number.parseFloat(formData["tolerance"].value);
 
   setData(equation, intervalA, intervalB, tolerance);
 
@@ -92,6 +95,12 @@ elSubmit.addEventListener("click", () => {
   if (method === "fakeposition") result = fakePosition();
   if (method === "fixedpoint") result = fixedPoint();
   if (method === "newtonraphson") result = newtonRaphson();
+
+	}catch(e){
+
+		alert(e.message);
+
+	}
 
   elIter.innerHTML = "";
   result.forEach((iter) => {
@@ -109,15 +118,26 @@ elOtroSubmit.addEventListener("click", () => {
   const formData = document.forms["formData"];
   const method = formData["method"].value;
 
-  const matrix = getMatrixFromInputs();
+  const matrix = getMatrixFromInputs();//[[3, 4, -2, 0], [2, -3, 4, 11], [1, -2, 3, 7]];//x=2, y=-1, z=1
   console.log("Matriz procesada:", matrix);
 
   let result = [];
 
+	try{
+
   if (method === "gaussjordan") result = gaussJordanMethod(matrix);
   if (method === "jacobi") result = jacobiMethod(matrix);
+  if (method === "seidel") result = seidelMethod(matrix);
 
-  /* elIter.innerHTML = "";
+	}catch(e){
+
+		alert(e.message);
+
+	}
+
+	console.log(result);
+
+  elIter.innerHTML = "";
   result.forEach((iter) => {
     elIter.innerHTML += `
       <li style="margin-top: 10px">
@@ -127,5 +147,5 @@ elOtroSubmit.addEventListener("click", () => {
           .join("\n")}</pre>
       </li>
     `;
-  }); */
+  }); /**/
 });

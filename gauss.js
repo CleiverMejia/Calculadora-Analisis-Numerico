@@ -1,19 +1,40 @@
+function seidelMethod(matrix) {
 
-console.log(Seidel(
+	const spectralRadius = seidelConditioned(matrix);
 
-	new Map().set('x_1', '(-4*x_2 + 2*x_3)/3').set('x_2', '(-2*x_1 - 4*x_3 + 11)/(-3)').set('x_3', '(-x_1 + 2*x_2 + 7)/7'),
-	new Map().set('x_1', 0).set('x_2', 0).set('x_3', 0), true, 0.00001
+	if (spectralRadius >= 1) {
 
-));// x = 2, y = -1, z = 1
-
-function Seidel(equations, initials, isSeidel = true, tol, maxIterations = 5000, currentIteration = 0) {
-
-	if (currentIteration >= maxIterations) {
-
-		console.log("Máx iterations reached");
-		return initials;
+		throw new Error(`Bad conditioned system for Gauss-Seidel. Spectral radious: ${spectralRadius.toFixed(6)} >= 1`);
 
 	}
+
+	const equations = new Map();
+	const initials = new Map();
+
+	for(let f = 0; f < matrix.length; f++) {
+		const row = matrix[f];
+		let equation = '';
+
+		for(let c = 0; c < row.length; c++) {
+			const coeficient = `${row[c]}*x_${c + 1}`;
+
+			if (c !== f && c < row.length - 1) {
+				equation += `${coeficient} + `;
+			}
+		}
+
+		equation = equation.replace(/ \+ $/, '');
+		equation = `(${row[row.length - 1]} - (${equation})) / ${row[f]}`;
+
+		equations.set(`x_${f + 1}`, equation);
+		initials.set(`x_${f + 1}`, 0);
+
+	}
+
+	return Seidel(equations, initials, 0.00001);
+}
+
+function Seidel(equations, initials, tol, maxIterations = 100) {
 
 	if (equations.size !== initials.size) {
 
@@ -21,41 +42,29 @@ function Seidel(equations, initials, isSeidel = true, tol, maxIterations = 5000,
 
 	}
 
-	const results = new Map();
+	const process = [];
+	let currentIteration = 0;
+	let results = new Map(initials);
 
+	process.push({
 
-	if (isSeidel) {
+		operation: "Valores iniciales",
+		matrix: [Array.from(results.values())]
 
-		const tempInitials = new Map(initials);
-		
-		equations.forEach((equation_value, main_key) => {
+	});
 
-			const f = math.compile(equation_value);
-			let evaluates = {};
+	while (currentIteration < maxIterations) {
 
-			tempInitials.forEach((value, key) => {
-
-				if (main_key !== key) {
-
-					evaluates[key] = value;
-				}
-
-			});
-
-			const result = f.evaluate(evaluates);
-			results.set(main_key, result);
-			tempInitials.set(main_key, result);
-
-		});
-
-	}/* else {//Para Jacobi también
+		const tempInitials = new Map(results);
+		const newResults = new Map();
+		const iterationValues = [];
 
 		equations.forEach((equation_value, main_key) => {
 
 			const f = math.compile(equation_value);
 			let evaluates = {};
 
-			initials.forEach((value, key) => {
+			results.forEach((value, key) => {
 
 				if (main_key !== key) {
 
@@ -66,24 +75,51 @@ function Seidel(equations, initials, isSeidel = true, tol, maxIterations = 5000,
 			});
 
 			const result = f.evaluate(evaluates);
+			newResults.set(main_key, result);
 			results.set(main_key, result);
+			iterationValues.push(result);
 
 		});
 
-	}*/
+		const error = calculateError(tempInitials, newResults);
 
-	const error = calculateError(initials, results);
-	console.log(`Iteración ${currentIteration + 1}: error = ${error}`);
+		process.push({
 
-	if (error < tol) {
+			operation: `Iteración ${currentIteration + 1} (Error: ${error.toFixed(6)})`,
+			matrix: [iterationValues]
 
-		console.log("Convergen reached");
-		return results;
+		});
+
+		if (error < tol || error==Infinity || error==0) {
+
+			process.push({
+
+				operation: "Convergencia alcanzada",
+				matrix: [Array.from(newResults.values())]
+
+			});
+
+			break;
+
+		}
+
+		results = new Map(newResults);
+		currentIteration++;
 
 	}
 
-	return Seidel(equations, results, isSeidel, tol, maxIterations, currentIteration + 1);
+	if (currentIteration >= maxIterations) {
 
+		process.push({
+
+			operation: "Máximo de iteraciones alcanzado",
+			matrix: [Array.from(results.values())]
+
+		});
+
+	}
+
+	return process;
 }
 
 function calculateError(last, current) {
@@ -104,4 +140,55 @@ function calculateError(last, current) {
 
 	return error;
 
+}
+
+function seidelConditioned(matrix) {
+
+	const n = matrix.length;
+	const coeffMatrix = matrix.map(row => row.slice(0, n));
+	
+	const D = [];
+	const L = [];
+	const U = [];
+	
+	for (let i = 0; i < n; i++) {
+		D[i] = Array(n).fill(0);
+		L[i] = Array(n).fill(0);
+		U[i] = Array(n).fill(0);
+		
+		for (let j = 0; j < n; j++) {
+			if (i === j) {
+				D[i][j] = coeffMatrix[i][j];
+			} else if (i > j) {
+				L[i][j] = coeffMatrix[i][j];
+			} else {
+				U[i][j] = coeffMatrix[i][j];
+			}
+		}
+	}
+
+	try {
+		// T_GS = (D - L)^{-1} * U
+		const D_minus_L = math.subtract(D, L);
+		const inv_D_minus_L = math.inv(D_minus_L);
+		const T_GS = math.multiply(inv_D_minus_L, U);
+		
+		// Calcular autovalores de T_GS
+		const eig = math.eigs(T_GS);
+		const eigenvalues = eig.values;
+		
+		// Encontrar el radio espectral (máximo valor absoluto)
+		let spectralRadius = 0;
+		for (let i = 0; i < eigenvalues.length; i++) {
+			const absEigen = Math.abs(eigenvalues[i]);
+			if (absEigen > spectralRadius) {
+				spectralRadius = absEigen;
+			}
+		}
+		
+		return spectralRadius;
+	} catch (error) {
+		console.warn("No se pudo calcular el radio espectral para Gauss-Seidel:", error);
+		return Infinity;
+	}
 }

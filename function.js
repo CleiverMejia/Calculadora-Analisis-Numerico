@@ -33,7 +33,7 @@ function solutionEquation(method, a, b, iteration = [], lastError = null) {
   const p = f.evaluate({ x: a }) * f.evaluate({ x: b });
 
   if (p > 0) {
-    alert("Function does not cross the x-axis");
+    throw new Error("Function does not cross the x-axis");
     return;
   }
 
@@ -48,7 +48,7 @@ function solutionEquation(method, a, b, iteration = [], lastError = null) {
   const error = Math.abs(b - a); // calcula el error
 
   if (aprox === Infinity || isNaN(aprox)) {
-    alert("The method diverges to infinity or is undefined");
+    throw new Error("The method diverges to infinity or is undefined");
     return;
   }
 
@@ -80,7 +80,7 @@ function fixedPoint() {
   } else if (evalB < intervalB && evalB > intervalA) {
     if (evalB === 0) return [intervalB];
   } else {
-    alert("The function does not meet the fixed point conditions");
+    throw new Error("The function does not meet the fixed point conditions");
     return;
   }
 
@@ -92,7 +92,7 @@ function fixedPoint() {
   const dB = fPrime.evaluate({ x: intervalB });
 
   if (Math.abs(dA) > 1 || Math.abs(dB) > 1) {
-    alert("The function does not meet the contraction conditions");
+    throw new Error("The function does not meet the contraction conditions");
     return;
   }
 
@@ -119,7 +119,7 @@ function solutionOpenEquation(
   const error = Math.abs(b - a); // calcula el error, comparando ambos valores
 
   if (a === Infinity || isNaN(a)) {
-    alert("The method diverges to infinity or is undefined");
+    throw new Error("The method diverges to infinity or is undefined");
     return;
   }
 
@@ -146,7 +146,7 @@ function jacobiMethod(A) {
   // esto lo llama el html
   console.log(jacobiConditioned(A));
 
-  if (jacobiConditioned(A) < 1) alert("Converge");
+  if (jacobiConditioned(A) < 1) throw new Error("Converge");
 
   // convertir los valores de la matriz a formato de ecuaciones x1 + x2 = 0, etc
   const vectorStrings = A.reduce((acc, row) => {
