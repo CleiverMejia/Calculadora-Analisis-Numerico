@@ -93,7 +93,6 @@ function fixedPoint() {
 
   if (Math.abs(dA) > 1 || Math.abs(dB) > 1) {
     throw new Error("The function does not meet the contraction conditions");
-    return;
   }
 
   method = (a) => f.evaluate({ x: a });
@@ -120,7 +119,6 @@ function solutionOpenEquation(
 
   if (a === Infinity || isNaN(a)) {
     throw new Error("The method diverges to infinity or is undefined");
-    return;
   }
 
   const replacedX = equation.replace("x", `(${oldRes})`);
@@ -141,12 +139,12 @@ function gaussJordanMethod(matrix) {
 const { Equation } = algebra;
 
 const tolerance = 0.003;
+let jacobiIterations = [];
 
 function jacobiMethod(A) {
   // esto lo llama el html
-  console.log(jacobiConditioned(A));
-
   if (jacobiConditioned(A) < 1) throw new Error("Converge");
+  jacobiIterations = [];
 
   // convertir los valores de la matriz a formato de ecuaciones x1 + x2 = 0, etc
   const vectorStrings = A.reduce((acc, row) => {
@@ -163,13 +161,13 @@ function jacobiMethod(A) {
   console.log(vectorStrings);
 
   const clears = clear(vectorStrings);
-  console.log(clears);
-  console.log(Array.isArray(clears));
 
   jacobi(clears, Array(clears.length).fill(0));
+
+  return jacobiIterations;
 }
 
-function jacobi(sel = [], values) {
+function jacobi(sel, values) {
   // la funcion que hace jacobi
   const newValues = [];
 
@@ -193,21 +191,24 @@ function jacobi(sel = [], values) {
     newValues[index] = equaEvaluated;
   });
 
+  jacobiIterations.push({
+    operation: `Iteración #${jacobiIterations.length}`,
+    matrix: [newValues],
+  });
+
   const err = jacobiError(values, newValues);
   console.log("Error:", err);
 
-  if (err < tolerance) return newValues;
+  if (err < tolerance) return;
 
   return jacobi(sel, newValues);
 }
 
 function jacobiError(prev, actual) {
-  // Calcula el error
   return prev.reduce((acc, act, i) => acc + Math.abs(act - actual[i]), 0);
 }
 
 function jacobiConditioned(A) {
-  // Revisa si jacobi esta bien condicionado
   const newA = [];
   A.forEach((row, i) => {
     let newRow = [];
@@ -226,8 +227,6 @@ function jacobiConditioned(A) {
 
   return rho;
 }
-
-// const equations = ["3*x1 + x2 = 3", "x1 + 2*x2 = 4"];
 
 function clear(equations) {
   // Despeja las ecuaciones
