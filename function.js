@@ -143,7 +143,7 @@ let jacobiIterations = [];
 
 function jacobiMethod(A) {
   // esto lo llama el html
-  if (jacobiConditioned(A) < 1) throw new Error("Converge");
+  if (jacobiConditioned(A) > 1) throw new Error("No converge");
   jacobiIterations = [];
 
   // convertir los valores de la matriz a formato de ecuaciones x1 + x2 = 0, etc
@@ -164,6 +164,7 @@ function jacobiMethod(A) {
 
   jacobi(clears, Array(clears.length).fill(0));
 
+  jacobiIterations.length = 100;
   return jacobiIterations;
 }
 
@@ -199,7 +200,7 @@ function jacobi(sel, values) {
   const err = jacobiError(values, newValues);
   console.log("Error:", err);
 
-  if (err < tolerance) return;
+  if (err < tolerance || err === Infinity || isNaN(err)) return;
 
   return jacobi(sel, newValues);
 }
