@@ -143,6 +143,8 @@ let jacobiIterations = [];
 
 function jacobiMethod(A) {
   // esto lo llama el html
+  console.log(jacobiConditioned(A));
+
   if (jacobiConditioned(A) > 1) throw new Error("No converge");
   jacobiIterations = [];
 
@@ -206,7 +208,9 @@ function jacobi(sel, values) {
 }
 
 function jacobiError(prev, actual) {
-  return prev.reduce((acc, act, i) => acc + Math.abs(act - actual[i]), 0);
+  return Math.sqrt(
+    prev.reduce((acc, act, i) => acc + Math.pow(act - actual[i], 2), 0)
+  );
 }
 
 function jacobiConditioned(A) {
@@ -224,7 +228,17 @@ function jacobiConditioned(A) {
 
   const eig = math.eigs(newA);
 
-  const rho = Math.max(...eig.values.map((v) => Math.abs(v)));
+  console.log(eig);
+
+  const rho = Math.max(
+    ...eig.values.map((v) => {
+      if (v instanceof Object) {
+        return Math.sqrt(Math.pow(v.im, 2) + Math.pow(v.re, 2));
+      }
+
+      return v;
+    })
+  );
 
   return rho;
 }
