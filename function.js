@@ -149,16 +149,7 @@ function jacobiMethod(A) {
   jacobiIterations = [];
 
   // convertir los valores de la matriz a formato de ecuaciones x1 + x2 = 0, etc
-  const vectorStrings = A.reduce((acc, row) => {
-    const expr = row
-      .map((val, j) =>
-        j === row.length - 1 ? `= ${val}` : `+ (${val}*x${j + 1})`
-      )
-      .join(" ")
-      .replace("+ ", "");
-    acc.push(expr);
-    return acc;
-  }, []);
+  const vectorStrings = toSystem(A);
 
   console.log(vectorStrings);
 
@@ -168,6 +159,19 @@ function jacobiMethod(A) {
 
   jacobiIterations.length = 100;
   return jacobiIterations;
+}
+
+function toSystem(A) {
+  return A.reduce((acc, row) => {
+    const expr = row
+      .map((val, j) =>
+        j === row.length - 1 ? `= ${val}` : `+ (${val}*x${j + 1})`
+      )
+      .join(" ")
+      .replace("+ ", "");
+    acc.push(expr);
+    return acc;
+  }, []);
 }
 
 function jacobi(sel, values) {
@@ -236,7 +240,7 @@ function jacobiConditioned(A) {
         return Math.sqrt(Math.pow(v.im, 2) + Math.pow(v.re, 2));
       }
 
-      return v;
+      return Math.abs(v);
     })
   );
 

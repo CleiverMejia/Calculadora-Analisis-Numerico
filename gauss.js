@@ -1,3 +1,5 @@
+
+
 function seidelMethod(matrix) {
 	// Calcular el radio espectral para verificar si el sistema está bien condicionado
 	const spectralRadius = seidelConditioned(matrix);
@@ -12,30 +14,18 @@ function seidelMethod(matrix) {
 	// Mapa para almacenar los valores iniciales de cada variable (generalmente 0)
 	const initials = new Map();
 
-	// Construir las ecuaciones para cada variable
-	for(let f = 0; f < matrix.length; f++) {
-		const row = matrix[f];
-		let equation = '';
+	const system = toSystem(matrix);
 
-		// Construir la parte derecha de la ecuación (suma de términos excepto la variable actual)
-		for(let c = 0; c < row.length; c++) {
-			const coeficient = `${row[c]}*x_${c + 1}`;
+	// Usar la librería algebra.js para parsear y despejar las ecuaciones
+	for (let i = 0; i < system.length; i++) {
 
-			// Excluir la variable actual y el término independiente (última columna)
-			if (c !== f && c < row.length - 1) {
-				equation += `${coeficient} + `;
-			}
-		}
+		const [left, right] = system[i].split(" = ");
 
-		// Eliminar el último " + " sobrante
-		equation = equation.replace(/ \+ $/, '');
-		// Formar la ecuación completa: x_i = (b_i - suma)/a_ii
-		equation = `(${row[row.length - 1]} - (${equation})) / ${row[f]}`;
+		const parsed = algebra.parse(left.trim());
 
-		// Guardar la ecuación para la variable x_{f+1}
-		equations.set(`x_${f + 1}`, equation);
-		// Inicializar el valor de la variable en 0
-		initials.set(`x_${f + 1}`, 0);
+		equations.set(`x${i + 1}`, new Equation(parsed, +right.trim()).solveFor(`x${i + 1}`).toString());
+		initials.set(`x${i + 1}`, 0);
+
 	}
 
 	// Ejecutar el método de Gauss-Seidel con las ecuaciones construidas
@@ -90,7 +80,7 @@ function Seidel(equations, initials, tol, maxIterations = 100) {
 		});
 
 		// Calcular el error como la máxima diferencia entre iteraciones
-		const error = calculateError(tempInitials, newResults);
+		const error = seidelError(tempInitials, newResults);
 
 		// Registrar esta iteración en el proceso
 		process.push({
@@ -123,18 +113,14 @@ function Seidel(equations, initials, tol, maxIterations = 100) {
 	return process;
 }
 
-function calculateError(last, current) {
-	let error = 0;
+function seidelError(last, current) {
 
-	// Calcular el error como la máxima diferencia absoluta entre iteraciones consecutivas
-	last.forEach((value, key) => {
-		const currentError = math.abs(current.get(key) - value);
-		if (currentError > error) {
-			error = currentError;
-		}
-	});
+	return math.sqrt(
 
-	return error;
+		math.sum(Array.from(last.keys()).map(key => math.pow(current.get(key) - last.get(key), 2)))
+
+	);
+
 }
 
 function seidelConditioned(matrix) {
