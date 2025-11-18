@@ -29,6 +29,15 @@ methodSelected.addEventListener("change", (e) => {
     params1.style.display = "block";
     params2.style.display = "none";
   }
+  const toleranceLabel = document.getElementById("tol");
+  const toleranceValue = document.getElementById("tol_value");
+    if (e.target.value === "trapezoid") {
+      toleranceLabel.textContent = "Número de subintervalos (n):";
+	  toleranceValue.value = 100;
+    } else {
+      toleranceLabel.textContent = "Tolerancia:";
+	  toleranceValue.value = 0.2;
+    }
 });
 
 generateMatrixBtn.addEventListener("click", generateMatrixInputs);
@@ -97,6 +106,7 @@ elSubmit.addEventListener("click", () => {
     if (method === "fakeposition") result = fakePosition();
     if (method === "fixedpoint") result = fixedPoint();
     if (method === "newtonraphson") result = newtonRaphson();
+    if (method === "trapezoid") result = CompoundTrapezoid(equation, intervalA, intervalB, tolerance);
   } catch (e) {
     alert(e.message);
   }
