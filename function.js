@@ -257,3 +257,45 @@ function clear(equations) {
       .toString();
   });
 }
+
+//Otros Metodos
+
+function preparedData(points) {
+  const newData = [];
+  for (let i = 0; i < points.length; i++) {
+    newData.push({
+      x: points[i][0] || 0,
+      y: points[i][1] || 0,
+    });
+  }
+  return newData;
+}
+
+function larange(points, x) {
+  let result = 0;
+
+  for (let i = 0; i < points.length; i++) {
+    let { x: xi, y: yi } = points[i];
+    let termino = yi;
+
+    for (let j = 0; j < points.length; j++) {
+      if (i !== j) {
+        let { x: xj } = points[j];
+        termino *= (x - xj) / (xi - xj);
+      }
+    }
+
+    result += termino;
+  }
+
+  return [
+    {
+      operation: result,
+    },
+  ];
+}
+
+function splineMethod(matrix) {
+  const result = new Spline(matrix).solve();
+  return result;
+}

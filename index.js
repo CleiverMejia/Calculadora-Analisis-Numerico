@@ -1,43 +1,84 @@
 const elIter = document.getElementById("iteration");
 const elSubmit = document.getElementById("submit");
-const elOtroSubmit = document.getElementById("submit2");
+const elSubmit2 = document.getElementById("submit2");
+const elSubmit3 = document.getElementById("submit3");
 const methodSelected = document.getElementById("method");
 const params1 = document.getElementById("params1");
 const params2 = document.getElementById("params2");
+const target = document.getElementById("targetConteiner");
 let result = [];
 
 const matrixRowsInput = document.getElementById("matrixRows");
 const matrixColsInput = document.getElementById("matrixCols");
+const labelCols = document.getElementById("labelColumn");
 const generateMatrixBtn = document.getElementById("generateMatrix");
 const matrixInputContainer = document.getElementById("matrixInputContainer");
 
 window.onload = () => {
   params1.style.display = "block";
   params2.style.display = "none";
-  generateMatrixInputs();
 };
 
 methodSelected.addEventListener("change", (e) => {
+  const value = e.target.value;
+
   if (
-    e.target.value === "gaussjordan" ||
-    e.target.value === "jacobi" ||
-    e.target.value === "seidel"
+    [
+      "bisection",
+      "fakeposition",
+      "fixedpoint",
+      "newtonraphson",
+      "trapezoid",
+    ].includes(value)
   ) {
-    params1.style.display = "none";
-    params2.style.display = "block";
-  } else {
     params1.style.display = "block";
     params2.style.display = "none";
   }
+
+  if (["gaussjordan", "jacobi", "seidel"].includes(value)) {
+    params1.style.display = "none";
+    params2.style.display = "block";
+    labelCols.style.display = "block";
+    matrixColsInput.style.display = "block";
+    matrixColsInput.value = 4;
+
+    generateMatrixInputs();
+  }
+
+  // Colocar los nuevos metodos en el vector
+  if (["spline"].includes(value)) {
+    params1.style.display = "none";
+    params2.style.display = "block";
+    labelCols.style.display = "none";
+    matrixColsInput.style.display = "none";
+    matrixColsInput.value = 2;
+
+    generateMatrixInputs();
+  }
+
+  if (["larange"].includes(value)) {
+    params1.style.display = "none";
+    params2.style.display = "block";
+    labelCols.style.display = "none";
+    matrixColsInput.style.display = "none";
+    matrixColsInput.value = 2;
+    target.style.display = "block";
+    generateMatrixInputs();
+  }
+
+  if (!["larange"].includes(value)) {
+    target.style.display = "none";
+  }
+
   const toleranceLabel = document.getElementById("tol");
   const toleranceValue = document.getElementById("tol_value");
-    if (e.target.value === "trapezoid") {
-      toleranceLabel.textContent = "Número de subintervalos (n):";
-	  toleranceValue.value = 100;
-    } else {
-      toleranceLabel.textContent = "Tolerancia:";
-	  toleranceValue.value = 0.2;
-    }
+  if (value === "trapezoid") {
+    toleranceLabel.textContent = "Número de subintervalos (n):";
+    toleranceValue.value = 100;
+  } else {
+    toleranceLabel.textContent = "Tolerancia:";
+    toleranceValue.value = 0.2;
+  }
 });
 
 generateMatrixBtn.addEventListener("click", generateMatrixInputs);
@@ -73,7 +114,6 @@ function generateMatrixInputs() {
 }
 
 function getMatrixFromInputs() {
-  const cells = document.querySelectorAll(".matrix-cell");
   const rows = Number.parseInt(matrixRowsInput.value) || 3;
   const cols = Number.parseInt(matrixColsInput.value) || 4;
 
@@ -87,6 +127,8 @@ function getMatrixFromInputs() {
       matrix[i][j] = Number.parseFloat(cell.value) || 0;
     }
   }
+
+  console.log(matrix);
 
   return matrix;
 }
@@ -106,9 +148,11 @@ elSubmit.addEventListener("click", () => {
     if (method === "fakeposition") result = fakePosition();
     if (method === "fixedpoint") result = fixedPoint();
     if (method === "newtonraphson") result = newtonRaphson();
-    if (method === "trapezoid") result = CompoundTrapezoid(equation, intervalA, intervalB, tolerance);
+    if (method === "trapezoid")
+      result = CompoundTrapezoid(equation, intervalA, intervalB, tolerance);
   } catch (e) {
-    alert(e.message);
+    // alert(e.message); prueba ahora
+    console.log(e);
   }
 
   elIter.innerHTML = "";
@@ -123,7 +167,7 @@ elSubmit.addEventListener("click", () => {
   });
 });
 
-elOtroSubmit.addEventListener("click", () => {
+elSubmit2.addEventListener("click", () => {
   const formData = document.forms["formData"];
   const method = formData["method"].value;
 
@@ -136,21 +180,26 @@ elOtroSubmit.addEventListener("click", () => {
     if (method === "gaussjordan") result = gaussJordanMethod(matrix);
     if (method === "jacobi") result = jacobiMethod(matrix);
     if (method === "seidel") result = seidelMethod(matrix);
+    if (method === "spline") result = splineMethod(matrix);
+    if (method === "larange")
+      result = larange(preparedData(matrix), formData["target"].value);
   } catch (e) {
-    alert(e.message);
+    // alert(e.message);
+    console.log(e);
   }
-
-  console.log(result);
 
   elIter.innerHTML = "";
   result.forEach((iter) => {
     elIter.innerHTML += `
       <li style="margin-top: 10px">
         <b>${iter.operation}</b>
-        <pre>${iter.matrix
-          .map((row) => row.map((v) => v.toFixed(4)).join("\t"))
-          .join("\n")}</pre>
-      </li>
     `;
+    if (iter.matrix) {
+      elIter.innerHTML += `<pre>${iter.matrix
+        .map((row) => row.map((v) => v.toFixed(4)).join("\t"))
+        .join("\n")}</pre>`;
+    }
+
+    elIter.innerHTML += `</li>`;
   }); /**/
 });

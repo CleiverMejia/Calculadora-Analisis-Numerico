@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora de Análisis Numérico</title>
     <script src="gauss-jordan.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/algebra.js/0.2.6/algebra.js"></script>
+    <script src="./library/math.js"></script>
+    <script src="./library/algebra.js"></script>
     <script src="function.js"></script>
     <script src="gauss.js"></script>
+    <script src="spline.js"></script>
     <script src="trigonometry.js"></script>
     <script src="index.js" defer></script>
     <link rel="stylesheet" href="styles.css" />
@@ -31,7 +32,9 @@
             <option value="newtonraphson">Newton Raphson</option>
             <option value="gaussjordan">Gauss Jordan</option>
             <option value="seidel">Seidel</option>
+            <option value="larange">Larange</option>
             <option value="jacobi">Jacobi</option>
+            <option value="spline">Spline</option>
             <option value="trapezoid">Trapecio</option>
           </select>
           <br /><br />
@@ -60,7 +63,7 @@
               <label>Filas:</label>
               <input type="number" id="matrixRows" min="2" max="10" value="3" />
 
-              <label>Columnas:</label>
+              <label id="labelColumn">Columnas:</label>
               <input type="number" id="matrixCols" min="3" max="11" value="4" />
 
               <button type="button" id="generateMatrix" class="generate-btn">
@@ -71,6 +74,11 @@
 
             <div id="matrixInputContainer"></div>
             <br />
+            <div id="targetConteiner" style="display: none">
+              <label>Target:</label>
+              <input type="number" name="target" />
+              <br /><br />
+            </div>
 
             <input type="button" id="submit2" class="submit" value="Iterar" />
           </div>
