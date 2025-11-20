@@ -56,7 +56,7 @@ methodSelected.addEventListener("change", (e) => {
     generateMatrixInputs();
   }
 
-  if (["larange"].includes(value)) {
+  if (["larange", "interLineal"].includes(value)) {
     params1.style.display = "none";
     params2.style.display = "block";
     labelCols.style.display = "none";
@@ -66,7 +66,7 @@ methodSelected.addEventListener("change", (e) => {
     generateMatrixInputs();
   }
 
-  if (!["larange"].includes(value)) {
+  if (!["larange", "interLineal"].includes(value)) {
     target.style.display = "none";
   }
 
@@ -181,6 +181,9 @@ elSubmit2.addEventListener("click", () => {
     if (method === "jacobi") result = jacobiMethod(matrix);
     if (method === "seidel") result = seidelMethod(matrix);
     if (method === "spline") result = splineMethod(matrix);
+    if (method === "spline") result = splineMethod(matrix);
+    if (method === "interLineal")
+      result = linealInterpolationMethod(matrix, formData["target"].value);
     if (method === "larange")
       result = larange(preparedData(matrix), formData["target"].value);
   } catch (e) {

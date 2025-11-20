@@ -299,3 +299,44 @@ function splineMethod(matrix) {
   const result = new Spline(matrix).solve();
   return result;
 }
+
+function linealInterpolationMethod(matrix, target) {
+  interval = findInterval(matrix, target);
+  return linealInterpolation(interval[0], interval[1], target);
+}
+
+function findInterval(matrix, target) {
+  const ordenado = [...matrix].sort((a, b) => a[0] - b[0]);
+
+  for (let i = 0; i < ordenado.length - 1; i++) {
+    const actual = ordenado[i][0];
+    const siguiente = ordenado[i + 1][0];
+
+    // Ver si target está entre los dos puntos
+    if (actual <= target && target <= siguiente) {
+      return [ordenado[i], ordenado[i + 1]];
+    }
+  }
+
+  // Si no encontró intervalo, devolver vacío o manejar error
+  return null;
+}
+
+function linealInterpolation(pointA, pointB, target) {
+  m = (pointB[1] - pointA[1]) / (pointB[0] - pointA[0]);
+  op = ` y = ${m} * ( x - ${pointB[0]} ) + (${pointB[1]})`;
+  f = math.compile(op);
+  result = f.evaluate({ x: target });
+  return [
+    {
+      operation:
+        "<h4>Intervalo Seleccionado: </h4>[" + pointA + "] [" + pointB + "]",
+    },
+    {
+      operation: "<h4>Operación: </h4>" + op,
+    },
+    {
+      operation: "<h4>Resultado: </h4>" + result,
+    },
+  ];
+}

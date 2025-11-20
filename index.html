@@ -1,94 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculadora de Análisis Numérico</title>
-    <script src="gauss-jordan.js"></script>
-    <script src="./library/math.js"></script>
-    <script src="./library/algebra.js"></script>
-    <script src="function.js"></script>
-    <script src="gauss.js"></script>
-    <script src="spline.js"></script>
-    <script src="trigonometry.js"></script>
-    <script src="index.js" defer></script>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
 
-  <body>
-    <canvas id="backgroundCanvas"></canvas>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Análisis Numérico</title>
+  <script src="gauss-jordan.js"></script>
+  <script src="./library/math.js"></script>
+  <script src="./library/algebra.js"></script>
+  <script src="function.js"></script>
+  <script src="gauss.js"></script>
+  <script src="spline.js"></script>
+  <script src="trigonometry.js"></script>
+  <script src="index.js" defer></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-    <div class="container">
-      <h3>Calculadora de Análisis Numérico</h3>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
 
-      <form name="formData">
-        <fieldset>
-          <legend>Datos de Entrada</legend>
+  <div class="container">
+    <h3>Calculadora de Análisis Numérico</h3>
 
-          <select name="method" id="method">
-            <option value="bisection">Bisección</option>
-            <option value="fakeposition">Falsa posición</option>
-            <option value="fixedpoint">Punto fijo</option>
-            <option value="newtonraphson">Newton Raphson</option>
-            <option value="gaussjordan">Gauss Jordan</option>
-            <option value="seidel">Seidel</option>
-            <option value="larange">Larange</option>
-            <option value="jacobi">Jacobi</option>
-            <option value="spline">Spline</option>
-            <option value="trapezoid">Trapecio</option>
-          </select>
+    <form name="formData">
+      <fieldset>
+        <legend>Datos de Entrada</legend>
+
+        <select name="method" id="method">
+          <option value="bisection">Bisección</option>
+          <option value="fakeposition">Falsa posición</option>
+          <option value="fixedpoint">Punto fijo</option>
+          <option value="newtonraphson">Newton Raphson</option>
+          <option value="gaussjordan">Gauss Jordan</option>
+          <option value="seidel">Seidel</option>
+          <option value="interLineal">Interpolación Lineal</option>
+          <option value="larange">Larange</option>
+          <option value="jacobi">Jacobi</option>
+          <option value="spline">Spline</option>
+          <option value="trapezoid">Trapecio</option>
+        </select>
+        <br /><br />
+        <div id="params1">
+          <label>Ecuación:</label>
+          <input type="text" name="equation" value="20/(x^2 + 2x + 10)" />
           <br /><br />
-          <div id="params1">
-            <label>Ecuación:</label>
-            <input type="text" name="equation" value="20/(x^2 + 2x + 10)" />
-            <br /><br />
 
-            <label>Intervalo A:</label>
-            <input type="number" name="intervalA" value="1" />
-            <br /><br />
+          <label>Intervalo A:</label>
+          <input type="number" name="intervalA" value="1" />
+          <br /><br />
 
-            <label>Intervalo B:</label>
-            <input type="number" name="intervalB" value="2" />
-            <br /><br />
+          <label>Intervalo B:</label>
+          <input type="number" name="intervalB" value="2" />
+          <br /><br />
 
-            <label id="tol">Tolerancia:</label>
-            <input id="tol_value" type="number" name="tolerance" value="0.2" />
-            <br /><br />
+          <label id="tol">Tolerancia:</label>
+          <input id="tol_value" type="number" name="tolerance" value="0.2" />
+          <br /><br />
 
-            <input type="button" id="submit" class="submit" value="Iterar" />
+          <input type="button" id="submit" class="submit" value="Iterar" />
+        </div>
+
+        <div id="params2">
+          <div class="matrix-size-controls">
+            <label>Filas:</label>
+            <input type="number" id="matrixRows" min="2" max="10" value="3" />
+
+            <label id="labelColumn">Columnas:</label>
+            <input type="number" id="matrixCols" min="3" max="11" value="4" />
+
+            <button type="button" id="generateMatrix" class="generate-btn">
+              Generar Matriz
+            </button>
+          </div>
+          <br />
+
+          <div id="matrixInputContainer"></div>
+          <br />
+          <div id="targetConteiner" style="display: none">
+            <label>Target:</label>
+            <input type="number" name="target" />
+            <br /><br />
           </div>
 
-          <div id="params2">
-            <div class="matrix-size-controls">
-              <label>Filas:</label>
-              <input type="number" id="matrixRows" min="2" max="10" value="3" />
-
-              <label id="labelColumn">Columnas:</label>
-              <input type="number" id="matrixCols" min="3" max="11" value="4" />
-
-              <button type="button" id="generateMatrix" class="generate-btn">
-                Generar Matriz
-              </button>
-            </div>
-            <br />
-
-            <div id="matrixInputContainer"></div>
-            <br />
-            <div id="targetConteiner" style="display: none">
-              <label>Target:</label>
-              <input type="number" name="target" />
-              <br /><br />
-            </div>
-
-            <input type="button" id="submit2" class="submit" value="Iterar" />
-          </div>
-        </fieldset>
-      </form>
-
-      <fieldset class="results-section">
-        <legend>Iteraciones</legend>
-        <ol id="iteration"></ol>
+          <input type="button" id="submit2" class="submit" value="Iterar" />
+        </div>
       </fieldset>
-    </div>
-  </body>
+    </form>
+
+    <fieldset class="results-section">
+      <legend>Iteraciones</legend>
+      <ol id="iteration"></ol>
+    </fieldset>
+  </div>
+</body>
+
 </html>
